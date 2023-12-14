@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
+﻿using System.Collections.Generic;
 using Android.Content;
 using Android.Graphics;
-using Android.OS;
-using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -16,10 +9,9 @@ using FormsProofOfConcept.Droid.Renderers;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 using static Android.Support.V7.Widget.RecyclerView;
-using Adapter = Android.Support.V7.Widget.RecyclerView.Adapter;
 using ItemViewType = Xamarin.Forms.Platform.Android.ItemViewType;
 using View = Android.Views.View;
-using FormsProofOfConcept.ViewModels;
+using System.Collections;
 
 [assembly: ExportRenderer(typeof(StickyHeaderCollectionView), typeof(StickyHeaderRecyclerViewRenderer<GroupableItemsView, GroupableItemsViewAdapter<GroupableItemsView, IGroupableItemsViewSource>, IGroupableItemsViewSource>))]
 namespace FormsProofOfConcept.Droid.Renderers
@@ -34,9 +26,7 @@ namespace FormsProofOfConcept.Droid.Renderers
     {
         private GroupableItemsViewAdapter<TItemsView, TItemsViewSource> StickyHeaderAdapter => this.GetAdapter() as GroupableItemsViewAdapter<TItemsView, TItemsViewSource>;
 
-        private Dictionary<int, ImageView> _stickyHeaderCache = new Dictionary<int, ImageView>();
-
-        ItemsPageViewModel VM => Element?.BindingContext as ItemsPageViewModel;
+        private readonly Dictionary<int, ImageView> _stickyHeaderCache = new Dictionary<int, ImageView>();
 
         public StickyHeaderRecyclerViewRenderer(Context context) : base(context)
         {
@@ -47,10 +37,12 @@ namespace FormsProofOfConcept.Droid.Renderers
         public View GetHeaderLayout(int itemPosition)
         {
             var headerPosition = 0;
+            var itemsSource = ItemsView.ItemsSource as IList;
 
-            for (int i = 0; i < VM.Items.Count; i++)
+            for (int i = 0; i < itemsSource.Count; i++)
             {
-                itemPosition -= VM.Items[i].Count;
+                var innerItems = itemsSource[i] as IList;
+                itemPosition -= innerItems.Count;
                 itemPosition--;
                 if (itemPosition >= 0)
                 {
